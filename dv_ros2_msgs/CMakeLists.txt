@@ -19,6 +19,7 @@ set(msg_files
   "msg/CameraDiscovery.msg"
   "msg/Event.msg"
   "msg/EventArray.msg"
+  "msg/EventPacket.msg"
   "msg/Trigger.msg"
   "msg/Depth.msg"
   "msg/TimedKeypoint.msg"

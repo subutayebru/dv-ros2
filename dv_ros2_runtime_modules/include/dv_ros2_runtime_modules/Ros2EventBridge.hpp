@@ -4,6 +4,7 @@
 
 #include <dv_ros2_msgs/msg/event.hpp>
 #include <dv_ros2_msgs/msg/event_array.hpp>
+#include <dv_ros2_msgs/msg/event_packet.hpp>
 
 #include <boost/circular_buffer.hpp>
 #include <opencv2/opencv.hpp>
@@ -25,7 +26,8 @@ private:
     static inline const std::regex filenameCleanupRegex{"[^a-zA-Z-_\\d]"};
 
     std::shared_ptr<rclcpp::Node> node = nullptr;
-    std::shared_ptr<rclcpp::Publisher<dv_ros2_msgs::msg::EventArray>> event_pub = nullptr;
+    //std::shared_ptr<rclcpp::Publisher<dv_ros2_msgs::msg::EventArray>> event_pub = nullptr;
+    std::shared_ptr<rclcpp::Publisher<dv_ros2_msgs::msg::EventPacket>> event_pub = nullptr;
     std::shared_ptr<rclcpp::Publisher<sensor_msgs::msg::CameraInfo>> camera_info_pub = nullptr;
 
     uint16_t width = 0;
@@ -58,5 +60,6 @@ public:
 
     EventsBuffer::const_iterator findClosest(int64_t timestamp) const;
 
-    void publishEventsMsg(const dv_ros2_msgs::msg::EventArray &msg);
+    //void publishEventsMsg(const dv_ros2_msgs::msg::EventArray &msg);
+    void publishEventsMsg(const dv_ros2_msgs::msg::EventPacket &msg);
 };

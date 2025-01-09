@@ -11,6 +11,7 @@
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <dv_ros2_messaging/messaging.hpp>
 #include <dv_ros2_msgs/msg/event_array.hpp>
+#include <dv_ros2_msgs/msg/event_packet.hpp>
 #include <dv_ros2_msgs/msg/depth.hpp>
 #include <dv_ros2_msgs/msg/timed_keypoint.hpp>
 #include <dv_ros2_msgs/msg/timed_keypoint_array.hpp>
@@ -125,7 +126,9 @@ namespace dv_ros2_tracker
         
         DataQueue m_data_queue;
 
-        rclcpp::Subscription<dv_ros2_msgs::msg::EventArray>::SharedPtr m_events_array_subscriber;
+        //rclcpp::Subscription<dv_ros2_msgs::msg::EventArray>::SharedPtr m_events_array_subscriber;
+
+        rclcpp::Subscription<dv_ros2_msgs::msg::EventPacket>::SharedPtr m_events_packet_subscriber;
 
         rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr m_frame_subscriber;
 
@@ -149,7 +152,9 @@ namespace dv_ros2_tracker
 
         void stop();
 
-        void eventsArrayCallback(const dv_ros2_msgs::msg::EventArray::SharedPtr msgPtr);
+        //void eventsArrayCallback(const dv_ros2_msgs::msg::EventArray::SharedPtr msgPtr);
+        
+        void eventsPacketCallback(const dv_ros2_msgs::msg::EventPacket::SharedPtr msgPtr);
         
         void frameCallback(const sensor_msgs::msg::Image::SharedPtr msgPtr);
 

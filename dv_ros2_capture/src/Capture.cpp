@@ -53,9 +53,13 @@ namespace dv_ros2_capture
         {
             m_frame_publisher = m_node->create_publisher<sensor_msgs::msg::Image>("frame", 10);
         }
+        //if (m_params.events)
+        //{
+        //    m_events_publisher = m_node->create_publisher<dv_ros2_msgs::msg::EventArray>("events", 10);
+        //}
         if (m_params.events)
         {
-            m_events_publisher = m_node->create_publisher<dv_ros2_msgs::msg::EventArray>("events", 10);
+            m_events_publisher = m_node->create_publisher<dv_ros2_msgs::msg::EventPacket>("events", 10);
         }
         if (m_params.triggers)
         {

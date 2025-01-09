@@ -13,6 +13,7 @@
 // dv_ros2_msgs Headers
 #include "dv_ros2_msgs/msg/event.hpp"
 #include "dv_ros2_msgs/msg/event_array.hpp"
+#include "dv_ros2_msgs/msg/event_packet.hpp"
 #include "dv_ros2_messaging/messaging.hpp"
 
 namespace dv_ros2_visualization
@@ -68,7 +69,9 @@ namespace dv_ros2_visualization
         rcl_interfaces::msg::SetParametersResult paramsCallback(const std::vector<rclcpp::Parameter> &parameters);
     private:
         /// @brief Parameter initialization
-        inline void parameterInitilization() const;
+        //inline void parameterInitilization() const;
+
+        inline void parameterInitilization(); 
 
         /// @brief Print parameters
         inline void parameterPrinter() const;
@@ -82,26 +85,21 @@ namespace dv_ros2_visualization
 
         /// @brief Event callback function for populating queue
         /// @param events EventArray message
-        void eventCallback(dv_ros2_msgs::msg::EventArray::SharedPtr events);
-
-        /// @brief Slicer callback function
-        void slicerCallback(const dv::EventStore &events);
-        
-        /// @brief Visualization thread
-        void visualize();
-
-        /// @brief rclcpp node pointer
-        rclcpp::Node::SharedPtr m_node;
-
+        //void eventCallback(dv_ros2_msgs::msg::EventArray::SharedPtr events);
+        void eventCallback(dv_ros2_msgs::msg::EventPacket::SharedPtr events);
         /// @brief Parameters
         Params m_params;
+
+        void visualize();
+        void slicerCallback(const dv::EventStore &events);
 
         // Thread realted
         std::atomic<bool> m_spin_thread = true;
         std::thread m_visualization_thread;
 
         /// @brief EventArray subscriber
-        rclcpp::Subscription<dv_ros2_msgs::msg::EventArray>::SharedPtr m_events_subscriber;
+        //rclcpp::Subscription<dv_ros2_msgs::msg::EventArray>::SharedPtr m_events_subscriber;
+        rclcpp::Subscription<dv_ros2_msgs::msg::EventPacket>::SharedPtr m_events_subscriber;
 
         /// @brief Frame publisher
         rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr m_frame_publisher;

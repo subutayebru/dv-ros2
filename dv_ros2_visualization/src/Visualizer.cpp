@@ -2,14 +2,16 @@
 
 namespace dv_ros2_visualization
 {
-    Visualizer::Visualizer(const std::string &t_node_name) : Node(t_node_name), m_node{this}
+    Visualizer::Visualizer(const std::string &t_node_name) : Node(t_node_name)
     {
-        RCLCPP_INFO(m_node->get_logger(), "Constructor is initialized.");
+        //RCLCPP_INFO(m_node->get_logger(), "Constructor is initialized.");
+        RCLCPP_INFO(this->get_logger(), "Constructor is initialized.");
         parameterInitilization();
 
         if(!readParameters())
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read parameters.");
+            //RCLCPP_ERROR(m_node->get_logger(), "Failed to read parameters.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read parameters.");
             rclcpp::shutdown();
             std::exit(EXIT_FAILURE);
         }
@@ -17,22 +19,24 @@ namespace dv_ros2_visualization
         parameterPrinter();
 
         m_slicer = std::make_unique<dv::EventStreamSlicer>();
-        m_events_subscriber = m_node->create_subscription<dv_ros2_msgs::msg::EventArray>(
+        //m_events_subscriber = this->create_subscription<dv_ros2_msgs::msg::EventArray>(
+        //    "events", 10, std::bind(&Visualizer::eventCallback, this, std::placeholders::_1));
+        m_events_subscriber = this->create_subscription<dv_ros2_msgs::msg::EventPacket>(
             "events", 10, std::bind(&Visualizer::eventCallback, this, std::placeholders::_1));
-        m_frame_publisher = m_node->create_publisher<sensor_msgs::msg::Image>(m_params.image_topic, 10);
+        m_frame_publisher = this->create_publisher<sensor_msgs::msg::Image>(m_params.image_topic, 10);
 
-        RCLCPP_INFO(m_node->get_logger(), "Sucessfully launched.");
+        RCLCPP_INFO(this->get_logger(), "Sucessfully launched.");
     }
 
     void Visualizer::start()
     {
         m_visualization_thread = std::thread(&Visualizer::visualize, this);
-        RCLCPP_INFO(m_node->get_logger(), "Visualization thread is started.");
+        RCLCPP_INFO(this->get_logger(), "Visualization thread is started.");
     }
 
     void Visualizer::stop()
     {
-        RCLCPP_INFO(m_node->get_logger(), "Stopping the visualization node...");
+        RCLCPP_INFO(this->get_logger(), "Stopping the visualization node...");
         m_spin_thread = false;
         m_visualization_thread.join();
     }
@@ -42,8 +46,8 @@ namespace dv_ros2_visualization
         return m_spin_thread.load(std::memory_order_relaxed);
     }
 
-    void Visualizer::eventCallback(dv_ros2_msgs::msg::EventArray::SharedPtr events)
-    {
+    //void Visualizer::eventCallback(dv_ros2_msgs::msg::EventArray::SharedPtr events)
+    void Visualizer::eventCallback(dv_ros2_msgs::msg::EventPacket::SharedPtr events){
         if (m_visualizer == nullptr)
         {
             m_visualizer = std::make_unique<dv::visualization::EventVisualizer>(cv::Size(events->width, events->height));
@@ -57,7 +61,7 @@ namespace dv_ros2_visualization
         }
         catch (std::out_of_range &e)
         {
-            RCLCPP_WARN_STREAM(m_node->get_logger(), "Event out of range: " << e.what());
+            RCLCPP_WARN_STREAM(this->get_logger(), "Event out of range: " << e.what());
         }
     }
 
@@ -86,7 +90,7 @@ namespace dv_ros2_visualization
 
     void Visualizer::visualize()
     {
-        RCLCPP_INFO(m_node->get_logger(), "Starting visualization.");
+        RCLCPP_INFO(this->get_logger(), "Starting visualization.");
         while (m_spin_thread)
         {
             m_event_queue.consume_all([&](const dv::EventStore &events)
@@ -105,105 +109,106 @@ namespace dv_ros2_visualization
 
     Visualizer::~Visualizer()
     {
-        RCLCPP_INFO(m_node->get_logger(), "Destructor is activated.");
+        RCLCPP_INFO(this->get_logger(), "Destructor is activated.");
         stop();
         rclcpp::shutdown();
     }
 
-    inline void Visualizer::parameterInitilization() const
+    //inline void Visualizer::parameterInitilization() const
+    inline void Visualizer::parameterInitilization() 
     {
         rcl_interfaces::msg::ParameterDescriptor descriptor;
         rcl_interfaces::msg::IntegerRange int_range;
         rcl_interfaces::msg::FloatingPointRange float_range;
 
-        m_node->declare_parameter("image_topic", m_params.image_topic);
+        this->declare_parameter<std::string>("image_topic", m_params.image_topic);
         float_range.set__from_value(10.0).set__to_value(1000.0);
         descriptor.floating_point_range = {float_range};
-        m_node->declare_parameter("frame_rate", m_params.frame_rate, descriptor);
+        this->declare_parameter<double>("frame_rate", m_params.frame_rate, descriptor);
         int_range.set__from_value(0).set__to_value(255).set__step(1);
         descriptor.integer_range = {int_range};
-        m_node->declare_parameter("background_color_r", m_params.background_color_r, descriptor);
-        m_node->declare_parameter("background_color_g", m_params.background_color_g, descriptor);
-        m_node->declare_parameter("background_color_b", m_params.background_color_b, descriptor);
-        m_node->declare_parameter("positive_event_color_r", m_params.positive_event_color_r, descriptor);
-        m_node->declare_parameter("positive_event_color_g", m_params.positive_event_color_g, descriptor);
-        m_node->declare_parameter("positive_event_color_b", m_params.positive_event_color_b, descriptor);
-        m_node->declare_parameter("negative_event_color_r", m_params.negative_event_color_r, descriptor);
-        m_node->declare_parameter("negative_event_color_g", m_params.negative_event_color_g, descriptor);
-        m_node->declare_parameter("negative_event_color_b", m_params.negative_event_color_b, descriptor);
+        this->declare_parameter<int>("background_color_r", m_params.background_color_r, descriptor);
+        this->declare_parameter<int>("background_color_g", m_params.background_color_g, descriptor);
+        this->declare_parameter<int>("background_color_b", m_params.background_color_b, descriptor);
+        this->declare_parameter("positive_event_color_r", m_params.positive_event_color_r, descriptor);
+        this->declare_parameter("positive_event_color_g", m_params.positive_event_color_g, descriptor);
+        this->declare_parameter("positive_event_color_b", m_params.positive_event_color_b, descriptor);
+        this->declare_parameter("negative_event_color_r", m_params.negative_event_color_r, descriptor);
+        this->declare_parameter("negative_event_color_g", m_params.negative_event_color_g, descriptor);
+        this->declare_parameter("negative_event_color_b", m_params.negative_event_color_b, descriptor);
     }
 
     inline void Visualizer::parameterPrinter() const
     {
-        RCLCPP_INFO(m_node->get_logger(), "-------- Parameters --------");
-        RCLCPP_INFO(m_node->get_logger(), "image_topic: %s", m_params.image_topic.c_str());
-        RCLCPP_INFO(m_node->get_logger(), "frame_rate: %f", m_params.frame_rate);
-        RCLCPP_INFO(m_node->get_logger(), "background_color_r: %d", m_params.background_color_r);
-        RCLCPP_INFO(m_node->get_logger(), "background_color_g: %d", m_params.background_color_g);
-        RCLCPP_INFO(m_node->get_logger(), "background_color_b: %d", m_params.background_color_b);
-        RCLCPP_INFO(m_node->get_logger(), "positive_event_color_r: %d", m_params.positive_event_color_r);
-        RCLCPP_INFO(m_node->get_logger(), "positive_event_color_g: %d", m_params.positive_event_color_g);
-        RCLCPP_INFO(m_node->get_logger(), "positive_event_color_b: %d", m_params.positive_event_color_b);
-        RCLCPP_INFO(m_node->get_logger(), "negative_event_color_r: %d", m_params.negative_event_color_r);
-        RCLCPP_INFO(m_node->get_logger(), "negative_event_color_g: %d", m_params.negative_event_color_g);
-        RCLCPP_INFO(m_node->get_logger(), "negative_event_color_b: %d", m_params.negative_event_color_b);
+        RCLCPP_INFO(this->get_logger(), "-------- Parameters --------");
+        RCLCPP_INFO(this->get_logger(), "image_topic: %s", m_params.image_topic.c_str());
+        RCLCPP_INFO(this->get_logger(), "frame_rate: %f", m_params.frame_rate);
+        RCLCPP_INFO(this->get_logger(), "background_color_r: %d", m_params.background_color_r);
+        RCLCPP_INFO(this->get_logger(), "background_color_g: %d", m_params.background_color_g);
+        RCLCPP_INFO(this->get_logger(), "background_color_b: %d", m_params.background_color_b);
+        RCLCPP_INFO(this->get_logger(), "positive_event_color_r: %d", m_params.positive_event_color_r);
+        RCLCPP_INFO(this->get_logger(), "positive_event_color_g: %d", m_params.positive_event_color_g);
+        RCLCPP_INFO(this->get_logger(), "positive_event_color_b: %d", m_params.positive_event_color_b);
+        RCLCPP_INFO(this->get_logger(), "negative_event_color_r: %d", m_params.negative_event_color_r);
+        RCLCPP_INFO(this->get_logger(), "negative_event_color_g: %d", m_params.negative_event_color_g);
+        RCLCPP_INFO(this->get_logger(), "negative_event_color_b: %d", m_params.negative_event_color_b);
     }
 
     inline bool Visualizer::readParameters()
     {
-        if (!m_node->get_parameter("image_topic", m_params.image_topic))
+        if (!this->get_parameter("image_topic", m_params.image_topic))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter image_topic.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter image_topic.");
             return false;
         }
-        if (!m_node->get_parameter("frame_rate", m_params.frame_rate))
+        if (!this->get_parameter("frame_rate", m_params.frame_rate))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter frame_rate.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter frame_rate.");
             return false;
         }
-        if (!m_node->get_parameter("background_color_r", m_params.background_color_r))
+        if (!this->get_parameter("background_color_r", m_params.background_color_r))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter background_color_r.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter background_color_r.");
             return false;
         }
-        if (!m_node->get_parameter("background_color_g", m_params.background_color_g))
+        if (!this->get_parameter("background_color_g", m_params.background_color_g))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter background_color_g.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter background_color_g.");
             return false;
         }
-        if (!m_node->get_parameter("background_color_b", m_params.background_color_b))
+        if (!this->get_parameter("background_color_b", m_params.background_color_b))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter background_color_b.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter background_color_b.");
             return false;
         }
-        if (!m_node->get_parameter("positive_event_color_r", m_params.positive_event_color_r))
+        if (!this->get_parameter("positive_event_color_r", m_params.positive_event_color_r))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter positive_event_color_r.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter positive_event_color_r.");
             return false;
         }
-        if (!m_node->get_parameter("positive_event_color_g", m_params.positive_event_color_g))
+        if (!this->get_parameter("positive_event_color_g", m_params.positive_event_color_g))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter positive_event_color_g.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter positive_event_color_g.");
             return false;
         }
-        if (!m_node->get_parameter("positive_event_color_b", m_params.positive_event_color_b))
+        if (!this->get_parameter("positive_event_color_b", m_params.positive_event_color_b))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter positive_event_color_b.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter positive_event_color_b.");
             return false;
         }
-        if (!m_node->get_parameter("negative_event_color_r", m_params.negative_event_color_r))
+        if (!this->get_parameter("negative_event_color_r", m_params.negative_event_color_r))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter negative_event_color_r.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter negative_event_color_r.");
             return false;
         }
-        if (!m_node->get_parameter("negative_event_color_g", m_params.negative_event_color_g))
+        if (!this->get_parameter("negative_event_color_g", m_params.negative_event_color_g))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter negative_event_color_g.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter negative_event_color_g.");
             return false;
         }
-        if (!m_node->get_parameter("negative_event_color_b", m_params.negative_event_color_b))
+        if (!this->get_parameter("negative_event_color_b", m_params.negative_event_color_b))
         {
-            RCLCPP_ERROR(m_node->get_logger(), "Failed to read paramter negative_event_color_b.");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read paramter negative_event_color_b.");
             return false;
         }
         return true;

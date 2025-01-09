@@ -17,7 +17,8 @@ namespace dv_ros2_accumulation
 
         parameterPrinter();
 
-        m_events_subscriber = m_node->create_subscription<dv_ros2_msgs::msg::EventArray>("events", 10, std::bind(&Accumulator::eventCallback, this, std::placeholders::_1));
+        //m_events_subscriber = m_node->create_subscription<dv_ros2_msgs::msg::EventArray>("events", 10, std::bind(&Accumulator::eventCallback, this, std::placeholders::_1));
+        m_events_subscriber = m_node->create_subscription<dv_ros2_msgs::msg::EventPacket>("events", 10, std::bind(&Accumulator::eventCallback, this, std::placeholders::_1));
         m_frame_publisher = m_node->create_publisher<sensor_msgs::msg::Image>("image", 10);
         m_slicer = std::make_unique<dv::EventStreamSlicer>();
 
@@ -42,7 +43,8 @@ namespace dv_ros2_accumulation
         return m_spin_thread.load(std::memory_order_relaxed);
     }
 
-    void Accumulator::eventCallback(dv_ros2_msgs::msg::EventArray::SharedPtr events)
+    //void Accumulator::eventCallback(dv_ros2_msgs::msg::EventArray::SharedPtr events)
+    void Accumulator::eventCallback(dv_ros2_msgs::msg::EventPacket::SharedPtr events)
     {
             if (m_accumulator == nullptr)
             {

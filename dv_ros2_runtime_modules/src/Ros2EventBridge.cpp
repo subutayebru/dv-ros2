@@ -96,7 +96,8 @@ bool Ros2EventBridge::loadCalibrationFile(const std::string &filename)
 	return true;
 }
 
-void Ros2EventBridge::publishEventsMsg(const dv_ros2_msgs::msg::EventArray &msg)
+//void Ros2EventBridge::publishEventsMsg(const dv_ros2_msgs::msg::EventArray &msg)
+void Ros2EventBridge::publishEventsMsg(const dv_ros2_msgs::msg::EventPacket &msg)
 {
     event_pub->publish(msg);
     if (camera_info_pub)
@@ -125,8 +126,8 @@ void Ros2EventBridge::run()
 
         std::string topicNS = config.getString("topicNamespace");
 
-        event_pub = node->create_publisher<dv_ros2_msgs::msg::EventArray>(topicNS + "/events", 10);
-
+        //event_pub = node->create_publisher<dv_ros2_msgs::msg::EventArray>(topicNS + "/events", 10);
+        event_pub = node->create_publisher<dv_ros2_msgs::msg::EventPacket>(topicNS + "/events", 10);
         // Load calibration from file.
         setCameraID(events.getOriginDescription());
         if (loadCalibrationFile(config.getString("calibrationFile")))
@@ -152,16 +153,21 @@ void Ros2EventBridge::run()
             auto closestEvents = findClosest(timestamp);
             dv::EventStore store(**closestEvents);
 
-            auto eventsArray = dv_ros2_msgs::toRosEventsMessage(store, cv::Size(width, height));
-            publishEventsMsg(eventsArray);
+            //auto eventsArray = dv_ros2_msgs::toRosEventsMessage(store, cv::Size(width, height));
+            //publishEventsMsg(eventsArray);
+            auto eventsPacket = dv_ros2_msgs::toRosEventsMessage(store, cv::Size(width, height));
+            publishEventsMsg(eventsPacket);
         }
     }
     else
     {
         dv::EventStore store(events.events().getBasePointer());
-        auto eventsArray = dv_ros2_msgs::toRosEventsMessage(store, cv::Size(width, height));
+        //auto eventsArray = dv_ros2_msgs::toRosEventsMessage(store, cv::Size(width, height));
 
-        publishEventsMsg(eventsArray);
+        //publishEventsMsg(eventsArray);
+        auto eventsPacket = dv_ros2_msgs::toRosEventsMessage(store, cv::Size(width, height));
+
+        publishEventsMsg(eventsPacket);
     }
 }
 

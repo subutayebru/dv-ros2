@@ -23,6 +23,7 @@
 // dv_ros2_msgs Headers
 #include "dv_ros2_msgs/msg/event.hpp"
 #include "dv_ros2_msgs/msg/event_array.hpp"
+#include "dv_ros2_msgs/msg/event_packet.hpp"
 #include "dv_ros2_messaging/messaging.hpp"
 
 namespace dv_ros2_accumulation
@@ -106,7 +107,9 @@ namespace dv_ros2_accumulation
 
         /// @brief Event callback function for populating queue
         /// @param events EventArray message
-        void eventCallback(dv_ros2_msgs::msg::EventArray::SharedPtr events);
+        ///void eventCallback(dv_ros2_msgs::msg::EventArray::SharedPtr events);
+        void eventCallback(dv_ros2_msgs::msg::EventPacket::SharedPtr events);
+
 
         /// @brief Accumulation thread
         void accumulate();
@@ -128,7 +131,8 @@ namespace dv_ros2_accumulation
         std::thread m_accumulation_thread;
 
         // EventArray subscriber
-        rclcpp::Subscription<dv_ros2_msgs::msg::EventArray>::SharedPtr m_events_subscriber;
+        //rclcpp::Subscription<dv_ros2_msgs::msg::EventArray>::SharedPtr m_events_subscriber;
+        rclcpp::Subscription<dv_ros2_msgs::msg::EventPacket>::SharedPtr m_events_subscriber;
 
         /// @brief Frame publisher
         rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr m_frame_publisher;

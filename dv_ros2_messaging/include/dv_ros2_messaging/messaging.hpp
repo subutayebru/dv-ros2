@@ -8,6 +8,7 @@
 #define DV_ROS_MSGS(type) type##_<boost::container::allocator<void>>
 
 #include <dv_ros2_msgs/msg/event_array.hpp>
+#include <dv_ros2_msgs/msg/event_packet.hpp>
 #include <dv_ros2_msgs/msg/trigger.hpp>
 
 #include <boost/bind/bind.hpp>
@@ -167,9 +168,11 @@ namespace _detail {
 /// @param events DV EventStore
 /// @param resolution Resolution of the sensor
 /// @return ROS2 EventArray message
-[[nodiscard]] inline dv_ros2_msgs::msg::EventArray toRosEventsMessage(const dv::EventStore &events, const cv::Size &resolution) 
+///[[nodiscard]] inline dv_ros2_msgs::msg::EventArray toRosEventsMessage(const dv::EventStore &events, const cv::Size &resolution) 
+[[nodiscard]] inline dv_ros2_msgs::msg::EventPacket toRosEventsMessage(const dv::EventStore &events, const cv::Size &resolution) 
 {
-	dv_ros2_msgs::msg::EventArray msg;
+	//dv_ros2_msgs::msg::EventArray msg;
+	dv_ros2_msgs::msg::EventPacket msg;
 	rclcpp::Time time = toRosTime(events.getLowestTime());
 
 	int64_t secInMicro = static_cast<int64_t>(time.seconds()) * 1'000'000;
@@ -203,7 +206,8 @@ namespace _detail {
 /// @brief Convert an array message into an event store.
 /// @param message Event array message
 /// @return DV Event store
-[[nodiscard]] inline dv::EventStore toEventStore(const dv_ros2_msgs::msg::EventArray &message)
+//[[nodiscard]] inline dv::EventStore toEventStore(const dv_ros2_msgs::msg::EventArray &message)
+[[nodiscard]] inline dv::EventStore toEventStore(const dv_ros2_msgs::msg::EventPacket &message)
 {
 	if (message.events.empty())
     {

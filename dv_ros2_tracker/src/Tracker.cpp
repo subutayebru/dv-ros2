@@ -33,7 +33,8 @@ namespace dv_ros2_tracker
         stop();
     }
 
-    void Tracker::eventsArrayCallback(const dv_ros2_msgs::msg::EventArray::SharedPtr msgPtr)
+    //void Tracker::eventsArrayCallback(const dv_ros2_msgs::msg::EventArray::SharedPtr msgPtr)
+    void Tracker::eventsPacketCallback(const dv_ros2_msgs::msg::EventPacket::SharedPtr msgPtr)
     {
         if (msgPtr == nullptr)
         {
@@ -142,8 +143,8 @@ namespace dv_ros2_tracker
         }
         if (mode == OperationMode::EventsOnly || mode == OperationMode::Combined
             || mode == OperationMode::EventsOnlyCompensated || mode == OperationMode::CombinedCompensated) {
-            m_events_array_subscriber = m_node->create_subscription<dv_ros2_msgs::msg::EventArray>("events", 10, std::bind(&Tracker::eventsArrayCallback, this, std::placeholders::_1));
-            RCLCPP_INFO(m_node->get_logger(), "Subscribing to event stream..");
+           //m_events_array_subscriber = m_node->create_subscription<dv_ros2_msgs::msg::EventArray>("events", 10, std::bind(&Tracker::eventsArrayCallback, this, std::placeholders::_1));
+            m_events_packet_subscriber = m_node->create_subscription<dv_ros2_msgs::msg::EventPacket>("events", 10, std::bind(&Tracker::eventsPacketCallback, this, std::placeholders::_1));RCLCPP_INFO(m_node->get_logger(), "Subscribing to event stream..");
         }
         if (mode == OperationMode::FramesOnlyCompensated || mode == OperationMode::EventsOnlyCompensated
             || mode == OperationMode::CombinedCompensated) {

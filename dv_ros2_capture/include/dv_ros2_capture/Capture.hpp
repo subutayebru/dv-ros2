@@ -32,6 +32,7 @@
 #include <dv-processing/noise/background_activity_noise_filter.hpp>
 #include "dv_ros2_msgs/msg/event.hpp"
 #include "dv_ros2_msgs/msg/event_array.hpp"
+#include "dv_ros2_msgs/msg/event_packet.hpp"
 #include "dv_ros2_msgs/msg/trigger.hpp"
 #include "dv_ros2_capture/Reader.hpp"
 #include "dv_ros2_messaging/messaging.hpp"
@@ -101,7 +102,7 @@ namespace dv_ros2_capture
     private:
         rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr m_frame_publisher;
         rclcpp::Publisher<sensor_msgs::msg::CameraInfo>::SharedPtr m_camera_info_publisher;
-        rclcpp::Publisher<dv_ros2_msgs::msg::EventArray>::SharedPtr m_events_publisher;
+        rclcpp::Publisher<dv_ros2_msgs::msg::EventPacket>::SharedPtr m_events_publisher;
         rclcpp::Publisher<dv_ros2_msgs::msg::Trigger>::SharedPtr m_trigger_publisher;
         rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr m_imu_publisher;
         rclcpp::Publisher<dv_ros2_msgs::msg::CameraDiscovery>::SharedPtr m_discovery_publisher;
